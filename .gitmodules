@@ -1,0 +1,6 @@
+[submodule "libs/npm/phisyx-safety"]
+	path = libs/npm/phisyx-safety
+	url = https://github.com/PhiSyX/safety.js
+[submodule "libs/npm/phisyx-proposals"]
+	path = libs/npm/phisyx-proposals
+	url = https://github.com/PhiSyX/proposals.js

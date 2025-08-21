@@ -1,0 +1,5 @@
+packages:
+  - libs/npm/*
+
+catalog:
+  typescript: ^5.9.2

@@ -1,0 +1,18 @@
+{
+	"name": "@multiview/framework-frontend",
+	"private": true,
+	"version": "0.1.0",
+	"type": "module",
+	"imports": {
+		"#root/*": "./src/*.ts"
+	},
+	"exports": {
+		".": "./exports/module.ts",
+		"./builder": "./exports/builder.ts"
+	},
+	"dependencies": {
+		"@phisyx/safety.js": "workspace:",
+		"@phisyx/proposals.js": "workspace:",
+		"@vinejs/vine": "^3.0.1"
+	}
+}

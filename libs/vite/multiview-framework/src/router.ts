@@ -123,7 +123,7 @@ export class Router
 		}
 
 		if (rp instanceof RoutePath) {
-			rb = rb.withPath(rp.full().toString() as RoutePathLiteral);
+			rb = rb.withPath(rp);
 		} else if (rp instanceof RouteBuilder) {
 			rb = rp;
 		} else if (typeof rp === "object") {

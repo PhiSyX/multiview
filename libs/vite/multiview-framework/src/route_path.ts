@@ -34,6 +34,18 @@ export class RoutePath
 		this.#segments = segments;
 	}
 
+	prepend(segment: string): void;
+	prepend(segment: StringExtension): void;
+	prepend(segment: RoutePathSegment): void;
+	prepend(segment: string | StringExtension | RoutePathSegment): void
+	{
+		if (segment instanceof StringExtension || typeof segment === "string") {
+			this.#segments.unshift(new RoutePathSegment(segment.toString()));
+		} else {
+			this.#segments.unshift(segment);
+		}
+	}
+
 	first(options:  { unsafe: true    }): RoutePathSegment;
 	first(options?: { unsafe: false   }):                    Option<RoutePathSegment>;
 	first(options?: { unsafe: boolean }): RoutePathSegment | Option<RoutePathSegment>
@@ -60,7 +72,7 @@ export class RoutePath
 		return new RegExp(new StringExtension("")
 			.push('^')
 			.push(this.#segments.map((s) => {
-				if (s.isDynamic) return `(?<${s.dynSegment}>.+)`;
+				if (s.isDynamic) return `\/(?<${s.dynSegment}>.+)`;
 				return s.segment;
 			}))
 			.push('$')
@@ -104,6 +116,11 @@ export class RoutePath
 		};
 
 		return simple() || await adv();
+	}
+
+	toString()
+	{
+		return this.full();
 	}
 }
 

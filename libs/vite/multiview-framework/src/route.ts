@@ -27,7 +27,7 @@ export interface RouteLiteral<C>
 	/**
 	 * Chemin de la route
 	 */
-	path: RoutePathLiteral;
+	path: RoutePathLiteral | RoutePath;
 	/**
 	 * Handle de la route
 	 */
@@ -50,10 +50,14 @@ export class Route
 	#handler: RouteHandler;
 	#index: boolean = false;
 
-	constructor(id: RouteID, path: string, handler: RouteHandler)
+	constructor(id: RouteID, path: string | RoutePath, handler: RouteHandler)
 	{
 		this.#id = id;
-		this.#path = RoutePath.fromLiteral(path);
+		if (typeof path === "string") {
+			this.#path = RoutePath.fromLiteral(path);
+		} else {
+			this.#path = path;
+		}
 		this.#handler = handler;
 	}
 

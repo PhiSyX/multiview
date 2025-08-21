@@ -1,15 +1,20 @@
 import type { Option } from "@phisyx/safety.js/contracts";
-import type { LazyRenderClass, LazyTupleHandler, RenderClass, RouteHandler, TupleHandler } from "#root/route";
+import type {
+	LazyRenderClass, RenderClass,
+	LazyTupleHandler, TupleHandler,
+	RouteHandler,
+} from "#root/route";
 import type { RoutePathLiteral } from "#root/route_path";
 
 import { StringExtension } from "@phisyx/proposals.js/lang/string";
 import { None } from "@phisyx/safety.js/option";
+import { RoutePath } from "#root/route_path";
 import { Route } from "#root/route";
 
 export class RouteBuilder
 {
 	#prefix: StringExtension = new StringExtension("/");
-	#path: Option<RoutePathLiteral> = None();
+	#path: Option<RoutePathLiteral | RoutePath> = None();
 	#handler: Option<RouteHandler> = None();
 	#index = false;
 
@@ -19,7 +24,7 @@ export class RouteBuilder
 		return this;
 	}
 
-	withPath(path: RoutePathLiteral): this
+	withPath(path: RoutePathLiteral | RoutePath): this
 	{
 		this.#path.replace(path);
 		return this;
@@ -49,8 +54,16 @@ export class RouteBuilder
 		}
 
 		const routeId = crypto.randomUUID();
-		const routePath = this.#prefix.trimEnd("/").push(this.#path.unwrap());
-		const route = new Route(routeId, routePath.toString(), this.#handler.unwrap())
+
+		const routePath = this.#path.map((path) => {
+			if (path instanceof RoutePath) {
+				path.prepend(this.#prefix.trimEnd("/"));
+				return path;
+			}
+			return this.#prefix.trimEnd("/") + path;
+		});
+
+		const route = new Route(routeId, routePath.unwrap(), this.#handler.unwrap())
 			.withIndex(this.#index)
 		;
 

@@ -9,6 +9,9 @@ export default class HomeController
 		return {
 			head: {
 				title: "Home",
+				styles: [
+					() => import('../assets/dyn.css', { with: { type: "css" }}),
+				],
 			},
 			body: new Date,
 		};

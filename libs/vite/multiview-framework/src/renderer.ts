@@ -23,6 +23,7 @@ export class Renderer
 	static #domSchema = vine.object({
 		head: vine.object({
 			title: vine.string().optional(),
+			styles: vine.array(vine.any()).optional(),
 		}).optional(),
 		body: vine.any(),
 	});
@@ -149,6 +150,12 @@ export class Renderer
 				document.title = dom.head.title;
 			}
 
+			if (dom.head?.styles) {
+				for (const style of dom.head.styles) {
+					await this.renderStylesheet(style);
+				}
+			}
+
 			await this.renderDOM(dom.body, el, strategy);
 			return;
 		} catch {
@@ -178,6 +185,19 @@ export class Renderer
 	async renderPromise(value: Promise<any>, el: HTMLElement, strategy: symbol)
 	{
 		await this.#render(await value, el, strategy);
+	}
+
+	async renderStylesheet(style: string | Promise<{ default: CSSStyleSheet }>)
+	{
+		if (typeof style === "string") {
+			let sheet = new CSSStyleSheet();
+			sheet.insertRule(style);
+			document.adoptedStyleSheets.push(sheet);
+		} else if (style instanceof Function) {
+			document.adoptedStyleSheets.push((await style()).default);
+		} else {
+			console.warn("Style not supported ?", { style });
+		}
 	}
 
 	async #render(

@@ -13,7 +13,7 @@ export default class HomeController
 					() => import('../assets/dyn.css', { with: { type: "css" }}),
 				],
 			},
-			body: new Date,
+			body: () => new Date,
 		};
 	}
 }

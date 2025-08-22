@@ -163,7 +163,7 @@ export class Renderer
 
 		if (isLiteralObject(value)) {
 			await this.#render(JSON.stringify(value), el, strategy);
-			return
+			return;
 		}
 
 		console.warn("Value not supported ?", { value });
@@ -200,6 +200,14 @@ export class Renderer
 		}
 	}
 
+	async renderFunction(value: Function, el: HTMLElement, strategy: symbol)
+	{
+		const v = value();
+		if (v != null) {
+			await this.#render(v, el, strategy);
+		}
+	}
+
 	async #render(
 		value: ComponentRenderOutput | LazyComponentRenderOutput,
 		el: HTMLElement,
@@ -211,6 +219,9 @@ export class Renderer
 			case "number":
 			case "string":
 				return this.renderPrimitive(value, el, strategy);
+
+			case "function":
+				return this.renderFunction(value, el, strategy);
 
 			case "boolean":
 				return this.renderPrimitive(value ? "true" : "false", el, strategy);

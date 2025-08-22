@@ -17,6 +17,7 @@ export type ComponentRenderOutput =
 	| Node
 	| HTMLElement
 	| Date
+	| Function
 	| Record<string,
 		| string
 		| bigint
@@ -25,6 +26,7 @@ export type ComponentRenderOutput =
 		| Node
 		| HTMLElement
 		| Date
+		| Function
 	>;
 
 export type LazyComponentRenderOutput = Promise<ComponentRenderOutput>;

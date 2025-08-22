@@ -143,6 +143,11 @@ export class Renderer
 			return;
 		}
 
+		if ("render" in value && typeof value.render === "function") {
+			await this.#render(value.render(), el, strategy);
+			return;
+		}
+
 		try {
 			const dom = await vine.validate({ schema: Renderer.#domSchema, data: value });
 

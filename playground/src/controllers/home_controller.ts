@@ -6,6 +6,11 @@ export default class HomeController
 	{
 		await sleep(1500);
 
-		return "Home page";
+		return {
+			head: {
+				title: "Home",
+			},
+			body: new Date,
+		};
 	}
 }

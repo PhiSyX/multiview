@@ -1,6 +1,8 @@
+import type { Option } from "@phisyx/safety.js/contracts";
 import type { LazyRouters, Router } from "#root/router";
 import type { ComponentLayoutClass } from "#root/component";
 
+import { None } from "@phisyx/safety.js/option";
 import { Renderer } from "#root/renderer";
 import { RouterTree } from "#root/router_tree";
 
@@ -68,6 +70,10 @@ export class Application
 	 */
 	async start(): Promise<void>
 	{
+		if (!this.#options.el) return Promise.reject(new Error(
+			"We need an existing element in the DOM to display a view component."
+		));
+
 		const { pathname: userURLPathname } = window.location;
 
 		const { layout, route } = await this.#routerTree.match(userURLPathname).catch(
@@ -76,43 +82,33 @@ export class Application
 				` path '${userURLPathname}'.`
 			))
 		);
+
 		if (layout.is_some()) {
 			this.#renderer.setLayout(layout.unwrap());
 		}
 
 		this.#renderer.setHandler(route.getHandler());
 
+		this.#renderer.setElement(this.#options.el);
+
 		// DOM RENDERER //
+
+		let maybe$loader: Option<HTMLSlotElement> = None();
 
 		if (this.#options.loader) {
 			const loader = new this.#options.loader();
-			this.#options.el?.append(loader.render());
+			const $slot = document.createElement("slot");
+			$slot.name = "loader";
+			$slot.append(loader.render());
+			this.#options.el.appendChild($slot);
+			maybe$loader.replace($slot);
 		}
 
-		const output = await this.#renderer.render();
+		await this.#renderer.render();
 
 		if (this.#options.loader) {
-			this.#options.el?.lastElementChild?.remove();
-		}
-
-		switch (typeof output) {
-			case "bigint":
-			case "number":
-			case "string":
-			{
-				this.#options.el?.append(output.toString());
-			} return;
-
-			case "boolean":
-			{
-				this.#options.el?.append(output ? 'true' : 'false');
-			} return;
-		}
-
-		if (output instanceof Node) {
-			this.#options.el?.append(output);
-		} else {
-			this.#options.el?.append(JSON.stringify(output));
+			const $slot = maybe$loader.unwrap_unchecked();
+			$slot.remove();
 		}
 
 		console.log(`Starting ${this.#name} v${this.#version}`);

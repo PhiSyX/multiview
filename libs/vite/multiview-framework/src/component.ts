@@ -14,6 +14,17 @@ export type ComponentRenderOutput =
 	| bigint
 	| number
 	| boolean
-	| HTMLElement;
+	| Node
+	| HTMLElement
+	| Date
+	| Record<string,
+		| string
+		| bigint
+		| number
+		| boolean
+		| Node
+		| HTMLElement
+		| Date
+	>;
 
 export type LazyComponentRenderOutput = Promise<ComponentRenderOutput>;

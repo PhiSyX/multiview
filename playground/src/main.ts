@@ -1,3 +1,5 @@
+import "./assets/style.css";
+
 import { createApp, createRouter } from "@multiview/framework-frontend";
 import { path, param } from "@multiview/framework-frontend/builder";
 

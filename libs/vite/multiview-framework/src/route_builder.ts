@@ -54,13 +54,18 @@ export class RouteBuilder
 		}
 
 		const routeId = crypto.randomUUID();
-
+		const routePrefix = this.#prefix.trimEnd("/");
 		const routePath = this.#path.map((path) => {
 			if (path instanceof RoutePath) {
-				path.prepend(this.#prefix.trimEnd("/"));
+				path.prepend(routePrefix);
 				return path;
 			}
-			return this.#prefix.trimEnd("/") + path;
+
+			if (path === "/") {
+				this.#index = true;
+			}
+
+			return routePrefix.push(path).toString();
 		});
 
 		const route = new Route(routeId, routePath.unwrap(), this.#handler.unwrap())

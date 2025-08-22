@@ -16,6 +16,8 @@ import { RoutePath } from "#root/route_path";
 // Type //
 // ---- //
 
+export type LazyRouters = () => Promise<{ default: Array<Router> }>;
+
 export interface RouterOptions
 {
 	layout?: LazyComponentLayout;

@@ -34,6 +34,8 @@ const app = createApp(projectPackage.name, projectPackage.version, {
 })
 	.router(baseRouter)
 	.router(authRouter)
+	// Lazy Router, eg: from an external package
+	.router(() => import("./com.example/features/my-feature/my-feature.routes"))
 ;
 
 await app.start();

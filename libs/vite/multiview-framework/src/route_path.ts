@@ -23,7 +23,7 @@ export class RoutePath
 	};
 
 	static fromLiteral = (path: string) => new RoutePath(
-		path.split(/(\/[\w{}]*)/).filter(Boolean)
+		path.split(/(\/[\w-_{}]*)/).filter(Boolean)
 			.map((segment) => RoutePathSegment.from(segment))
 	);
 
@@ -40,7 +40,7 @@ export class RoutePath
 	prepend(segment: string | StringExtension | RoutePathSegment): void
 	{
 		if (segment instanceof StringExtension || typeof segment === "string") {
-			this.#segments.unshift(new RoutePathSegment(segment.toString()));
+			this.#segments.unshift(RoutePathSegment.from(segment.toString()));
 		} else {
 			this.#segments.unshift(segment);
 		}
@@ -118,9 +118,9 @@ export class RoutePath
 		return simple() || await adv();
 	}
 
-	toString()
+	toString(): string
 	{
-		return this.full();
+		return this.full().toString();
 	}
 }
 

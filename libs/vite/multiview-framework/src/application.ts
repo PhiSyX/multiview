@@ -1,4 +1,4 @@
-import type { Router } from "#root/router";
+import type { LazyRouters, Router } from "#root/router";
 import type { ComponentLayoutClass } from "#root/component";
 
 import { Renderer } from "#root/renderer";
@@ -55,9 +55,11 @@ export class Application
 	/**
 	 * Ajoute un routeur à l'arbre de routeurs.
 	 */
-	router(router: Router): this
+	router(lazyRouters: LazyRouters): this;
+	router(router: Router): this;
+	router(routerOrLazy: LazyRouters | Router): this
 	{
-		this.#routerTree.add(router);
+		this.#routerTree.add(routerOrLazy);
 		return this;
 	}
 

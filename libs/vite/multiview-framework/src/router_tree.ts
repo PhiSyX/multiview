@@ -1,6 +1,6 @@
 import type { Option } from "@phisyx/safety.js/contracts";
 import type { Route } from "#root/route";
-import type { Router, RouterOptions } from "#root/router";
+import type { LazyRouters, Router, RouterOptions } from "#root/router";
 
 import { RoutePath } from "#root/route_path";
 
@@ -22,15 +22,30 @@ type MatchFnOutput = Promise<
 export class RouterTree
 {
 	#routers: Array<Router> = [];
+	#lazyRouters: Array<LazyRouters> = [];
 
-	add(router: Router): this
+	add(lazyRouters: LazyRouters): this;
+	add(router: Router): this;
+	add(routerOrLazy: LazyRouters | Router): this
 	{
-		this.#routers.push(router);
+		if (typeof routerOrLazy === "function") {
+			this.#lazyRouters.push(routerOrLazy);
+		} else {
+			this.#routers.push(routerOrLazy);
+		}
 		return this;
 	}
 
 	async match(urlPathRaw: string): MatchFnOutput
 	{
+		this.#routers.push(
+			...(await Promise.all(this.#lazyRouters.map(
+				async (modRouter) => (await modRouter()).default
+			))).flat()
+		);
+
+		this.#lazyRouters = [];
+
 		const urlPath = RoutePath.fromLiteral(RoutePath.normalize(urlPathRaw));
 
 		const routes: Array<Readonly<[Router, Route]>> = this.#routers.flatMap((router) =>

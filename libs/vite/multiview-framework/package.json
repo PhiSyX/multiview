@@ -8,7 +8,8 @@
 	},
 	"exports": {
 		".": "./exports/module.ts",
-		"./builder": "./exports/builder.ts"
+		"./builder": "./exports/builder.ts",
+		"./dom": "./exports/dom.ts"
 	},
 	"dependencies": {
 		"@phisyx/safety.js": "workspace:",

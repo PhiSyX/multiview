@@ -34,10 +34,10 @@ export class RouteBuilder
 	withHandler(handler: RenderClass): this;
 	withHandler<C extends { new (): I }, I, T extends LazyTupleHandler<C> = LazyTupleHandler<C>>(c: T[0], m: T[1]): this;
 	withHandler<C extends { new (): I }, I, T extends TupleHandler<C> = TupleHandler<C>>(c: T[0], m: T[1]): this;
-	withHandler(h: RouteHandler, m?: string): this
+	withHandler(handler: RouteHandler, m?: string): this
 	{
-		if (h instanceof Function && m) this.#handler.replace([h, m]);
-		else this.#handler.replace(h);
+		if (handler instanceof Function && m) this.#handler.replace([handler, m]);
+		else this.#handler.replace(handler);
 		return this;
 	}
 

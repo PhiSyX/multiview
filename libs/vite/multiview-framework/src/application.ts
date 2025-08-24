@@ -58,9 +58,11 @@ export class Application
 	/**
 	 * Ajoute un routeur à l'arbre de routeurs.
 	 */
-	router(lazyRouters: LazyRouters): this;
-	router(router: Router): this;
-	router(routerOrLazy: LazyRouters | Router): this
+	router(
+		routerOrLazy:
+			| LazyRouters
+			| Router
+	): this
 	{
 		this.#routerTree.add(routerOrLazy);
 		return this;

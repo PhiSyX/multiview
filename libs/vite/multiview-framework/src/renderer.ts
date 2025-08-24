@@ -4,7 +4,6 @@ import type { LazyRenderClass, RenderClass, RouteHandler } from "#root/route";
 
 import vine from "@vinejs/vine";
 import { None } from "@phisyx/safety.js/option";
-import { HTMLElementExtension } from "../exports/dom";
 
 // ----------- //
 // Énumération //
@@ -14,6 +13,8 @@ export const RenderStrategy = {
 	Append: Symbol("Append"),
 	Swap: Symbol("Swap"),
 } as const;
+
+type RenderStrategyEnum = typeof RenderStrategy[keyof typeof RenderStrategy];
 
 // -------------- //
 // Implémentation //
@@ -54,7 +55,7 @@ export class Renderer
 
 		// case : () => import("...").default   ( LazyRenderClass )
 		// case : class { }                     ( RenderClass )
-		if (this.#isCallable(h))
+		if (isCallable(h))
 		{
 			let klass: RenderClass;
 			try {
@@ -71,7 +72,7 @@ export class Renderer
 		}
 		// case : [() => import("...""), method]
 		// case : [class, method]
-		else if (this.#isTuple(h))
+		else if (isTuple(h))
 		{
 			const handler: any = h[0];
 			const method: string = h[1];
@@ -80,7 +81,7 @@ export class Renderer
 			let instance: { [k: string]: () => ComponentRenderOutput };
 
 			try {
-				if (this.#isCallable(handler)) {
+				if (isCallable(handler)) {
 					klass = (await handler()).default;
 				} else {
 					klass = (await handler).default;
@@ -109,7 +110,7 @@ export class Renderer
 		el.replaceWith(n);
 	}
 
-	modify(value: any, el: HTMLElement, strategy: symbol)
+	modify(value: any, el: HTMLElement, strategy: RenderStrategyEnum)
 	{
 		if (strategy === RenderStrategy.Append) {
 			this.append(value, el);
@@ -121,13 +122,13 @@ export class Renderer
 	renderPrimitive(
 		value: { toString(): string },
 		el: HTMLElement,
-		strategy: symbol
+		strategy: RenderStrategyEnum,
 	)
 	{
 		this.modify(value.toString(), el, strategy);
 	}
 
-	async renderObject(value: object, el: HTMLElement, strategy: symbol)
+	async renderObject(value: object, el: HTMLElement, strategy: RenderStrategyEnum)
 	{
 		if (value instanceof Date) {
 			this.modify(value.toString(), el, strategy);
@@ -175,11 +176,7 @@ export class Renderer
 		console.warn("Value not supported ?", { value });
 	}
 
-	async renderDOM(
-		value: ComponentRenderOutput,
-		el: HTMLElement,
-		strategy: symbol
-	)
+	async renderDOM(value: ComponentRenderOutput, el: HTMLElement, strategy: RenderStrategyEnum)
 	{
 		if (isLiteralObject(value)) {
 			await this.pureRender(JSON.stringify(value), el, strategy);
@@ -188,7 +185,7 @@ export class Renderer
 		}
 	}
 
-	async renderPromise(value: Promise<any>, el: HTMLElement, strategy: symbol)
+	async renderPromise(value: Promise<any>, el: HTMLElement, strategy: RenderStrategyEnum)
 	{
 		await this.pureRender(await value, el, strategy);
 	}
@@ -206,7 +203,7 @@ export class Renderer
 		}
 	}
 
-	async renderFunction(value: Function, el: HTMLElement, strategy: symbol)
+	async renderFunction(value: Function, el: HTMLElement, strategy: RenderStrategyEnum)
 	{
 		const v = value();
 		if (v != null) {
@@ -217,7 +214,7 @@ export class Renderer
 	async pureRender(
 		value: ComponentRenderOutput | LazyComponentRenderOutput,
 		el: HTMLElement,
-		strategy: symbol,
+		strategy: RenderStrategyEnum,
 	)
 	{
 		switch(typeof value) {
@@ -236,21 +233,6 @@ export class Renderer
 		return this.renderObject(value, el, strategy);
 	}
 
-	#isCallable(h: unknown): h is LazyRenderClass
-	{
-		return typeof h === "function"
-	}
-
-	#isTuple(h: unknown): h is [unknown, string]
-	{
-		return Array.isArray(h) && typeof h[0] === "function";
-	}
-
-	#isLazy(r: unknown): r is LazyComponentRenderOutput
-	{
-		return typeof r === "object" && r?.constructor?.name === "Promise"
-	}
-
 	#useLayout = async (
 		className: string,
 		method: string,
@@ -260,7 +242,7 @@ export class Renderer
 
 		let rendered: ComponentRenderOutput;
 
-		if (this.#isLazy(renderedSyncOrLazy)) {
+		if (isLazy(renderedSyncOrLazy)) {
 			rendered = await renderedSyncOrLazy;
 		} else {
 			rendered = renderedSyncOrLazy;
@@ -295,4 +277,19 @@ function isLiteralObject(value: unknown): value is object
 {
 	return value != null && typeof value === "object" &&
 		value.constructor?.name === "Object";
+}
+
+function isCallable(h: unknown): h is LazyRenderClass
+{
+	return typeof h === "function"
+}
+
+function isTuple(h: unknown): h is [unknown, string]
+{
+	return Array.isArray(h) && typeof h[0] === "function";
+}
+
+function isLazy(r: unknown): r is LazyComponentRenderOutput
+{
+	return typeof r === "object" && r?.constructor?.name === "Promise"
 }

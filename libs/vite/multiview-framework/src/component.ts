@@ -1,5 +1,9 @@
 import type { HTMLElementExtension } from "../exports/dom";
 
+// ---- //
+// Type //
+// ---- //
+
 export type LazyComponentLayout = () => Promise<{ default: ComponentLayoutClass }>;
 
 export interface ComponentLayoutClass

@@ -3,8 +3,9 @@ import type { LazyRouters, Router } from "#root/router";
 import type { ComponentLayoutClass } from "#root/component";
 
 import { None } from "@phisyx/safety.js/option";
-import { Renderer } from "#root/renderer";
+import { RenderStrategy, Renderer } from "#root/renderer";
 import { RouterTree } from "#root/router_tree";
+import { slot } from "../exports/dom";
 
 // ---- //
 // Type //
@@ -97,11 +98,10 @@ export class Application
 
 		if (this.#options.loader) {
 			const loader = new this.#options.loader();
-			const $slot = document.createElement("slot");
-			$slot.name = "loader";
-			$slot.append(loader.render());
-			this.#options.el.appendChild($slot);
-			maybe$loader.replace($slot);
+			const $slot = slot("loader");
+			await this.#renderer.pureRender(loader.render(), $slot.el(), RenderStrategy.Append);
+			this.#options.el.appendChild($slot.el());
+			maybe$loader.replace($slot.el());
 		}
 
 		await this.#renderer.render();

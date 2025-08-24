@@ -1,3 +1,5 @@
+import type { HTMLElementExtension } from "../exports/dom";
+
 export type LazyComponentLayout = () => Promise<{ default: ComponentLayoutClass }>;
 
 export interface ComponentLayoutClass
@@ -7,15 +9,16 @@ export interface ComponentLayoutClass
 
 export interface ComponentLayout
 {
-	render(): HTMLElement;
+	render(): HTMLElement | HTMLElementExtension<keyof HTMLElementTagNameMap>;
 }
 export type ComponentRenderOutput =
 	| string
 	| bigint
 	| number
 	| boolean
-	| Node
+	| HTMLElementExtension<keyof HTMLElementTagNameMap>
 	| HTMLElement
+	| Node
 	| Date
 	| Function
 	| Record<string,
@@ -23,6 +26,7 @@ export type ComponentRenderOutput =
 		| bigint
 		| number
 		| boolean
+		| HTMLElementExtension<keyof HTMLElementTagNameMap>
 		| Node
 		| HTMLElement
 		| Date

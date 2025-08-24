@@ -4,12 +4,13 @@ import type { LazyRenderClass, RenderClass, RouteHandler } from "#root/route";
 
 import vine from "@vinejs/vine";
 import { None } from "@phisyx/safety.js/option";
+import { HTMLElementExtension } from "../exports/dom";
 
 // ----------- //
 // Énumération //
 // ----------- //
 
-const DOMRenderStrategy = {
+export const RenderStrategy = {
 	Append: Symbol("Append"),
 	Swap: Symbol("Swap"),
 } as const;
@@ -62,10 +63,10 @@ export class Renderer
 				klass = (h as unknown as RenderClass);
 			}
 
-			return this.#render(
+			return this.pureRender(
 				this.#useLayout(klass.name, "render", (new klass).render()),
 				this.#el,
-				DOMRenderStrategy.Append,
+				RenderStrategy.Append,
 			);
 		}
 		// case : [() => import("...""), method]
@@ -88,10 +89,10 @@ export class Renderer
 
 			instance = new klass;
 
-			return this.#render(
+			return this.pureRender(
 				this.#useLayout(klass.name, method, instance[method].call(instance)),
 				this.#el,
-				DOMRenderStrategy.Append,
+				RenderStrategy.Append,
 			);
 		}
 
@@ -110,7 +111,7 @@ export class Renderer
 
 	modify(value: any, el: HTMLElement, strategy: symbol)
 	{
-		if (strategy === DOMRenderStrategy.Append) {
+		if (strategy === RenderStrategy.Append) {
 			this.append(value, el);
 		} else {
 			this.swap(value, el);
@@ -144,7 +145,7 @@ export class Renderer
 		}
 
 		if ("render" in value && typeof value.render === "function") {
-			await this.#render(value.render(), el, strategy);
+			await this.pureRender(value.render(), el, strategy);
 			return;
 		}
 
@@ -167,7 +168,7 @@ export class Renderer
 		}
 
 		if (isLiteralObject(value)) {
-			await this.#render(JSON.stringify(value), el, strategy);
+			await this.pureRender(JSON.stringify(value), el, strategy);
 			return;
 		}
 
@@ -181,15 +182,15 @@ export class Renderer
 	)
 	{
 		if (isLiteralObject(value)) {
-			await this.#render(JSON.stringify(value), el, strategy);
+			await this.pureRender(JSON.stringify(value), el, strategy);
 		} else {
-			await this.#render(value, el, strategy);
+			await this.pureRender(value, el, strategy);
 		}
 	}
 
 	async renderPromise(value: Promise<any>, el: HTMLElement, strategy: symbol)
 	{
-		await this.#render(await value, el, strategy);
+		await this.pureRender(await value, el, strategy);
 	}
 
 	async renderStylesheet(style: string | Promise<{ default: CSSStyleSheet }>)
@@ -209,11 +210,11 @@ export class Renderer
 	{
 		const v = value();
 		if (v != null) {
-			await this.#render(v, el, strategy);
+			await this.pureRender(v, el, strategy);
 		}
 	}
 
-	async #render(
+	async pureRender(
 		value: ComponentRenderOutput | LazyComponentRenderOutput,
 		el: HTMLElement,
 		strategy: symbol,
@@ -281,9 +282,9 @@ export class Renderer
 		let mut_$slot = layoutOutput.querySelector("slot");
 
 		if (mut_$slot) {
-			await this.#render(rendered, mut_$slot, DOMRenderStrategy.Swap);
+			await this.pureRender(rendered, mut_$slot, RenderStrategy.Swap);
 		} else {
-			await this.#render(rendered, layoutOutput, DOMRenderStrategy.Append);
+			await this.pureRender(rendered, layoutOutput, RenderStrategy.Append);
 		}
 
 		return layoutOutput;

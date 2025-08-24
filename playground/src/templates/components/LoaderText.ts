@@ -1,9 +1,9 @@
+import { div } from "@multiview/framework-frontend/dom";
+
 export class LoaderText
 {
 	render()
 	{
-		const $div = document.createElement("div");
-		$div.textContent = "Chargement...";
-		return $div;
+		return div.text("Chargement...");
 	}
 }

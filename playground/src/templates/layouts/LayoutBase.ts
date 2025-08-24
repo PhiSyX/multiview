@@ -1,10 +1,9 @@
+import { div, slot } from "@multiview/framework-frontend/dom";
+
 export default class LayoutBase
 {
 	render()
 	{
-		const $div = document.createElement("div");
-		$div.classList.add("layout", "layout:base");
-		$div.append(document.createElement("slot"));
-		return $div;
+		return div.class("layout").class("layout:base").children(slot());
 	}
 }

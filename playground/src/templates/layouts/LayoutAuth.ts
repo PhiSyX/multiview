@@ -1,10 +1,9 @@
+import { div, slot } from "@multiview/framework-frontend/dom";
+
 export default class LayoutAuth
 {
 	render()
 	{
-		const $div = document.createElement("div");
-		$div.classList.add("layout", "layout:auth");
-		$div.append(document.createElement("slot"));
-		return $div;
+		return div.class("layout").class("layout:auth").children(slot());
 	}
 }

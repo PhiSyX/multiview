@@ -9,7 +9,8 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"@multiview/framework-frontend": "workspace:"
+		"@multiview/framework-frontend": "workspace:",
+		"@vinejs/vine": "^3.0.1"
 	},
 	"devDependencies": {
 		"typescript": "catalog:",

@@ -1,4 +1,4 @@
-import { div } from "@multiview/framework-frontend/dom";
+import { br, div, span, tab } from "@multiview/framework-frontend/dom";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -23,16 +23,21 @@ export default class HomeController
 				.class({ hello: true, world: false, hello_world: () => true })
 				// attrs
 				.attr("role", "main")
-				.attrs({ align: "center" })
+				.attrs({ tabIndex: "-1" })
 				// dataset
 				.dataset({ name: "John Doe" })
 				// style
-				.style("color", "red")
+				.style("color", "blue")
 				.style({ background: "yellow" })
 				// content
 				.text("Click here")
 				.children(
-					div.text("hey").style("color", "blue")
+					2,
+					"\n",
+					"\thello",
+					br(),
+					tab(8),
+					span.text("world").style("color", "red"),
 				)
 				// events
 				.on("dblclick", (evt) => {

@@ -10,7 +10,7 @@
 	},
 	"dependencies": {
 		"@multiview/framework-frontend": "workspace:",
-		"@vinejs/vine": "^3.0.1"
+		"zod": "^4.1.1"
 	},
 	"devDependencies": {
 		"typescript": "catalog:",

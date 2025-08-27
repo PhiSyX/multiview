@@ -1,9 +1,8 @@
-import type { VineAny } from "@vinejs/vine";
 import type { Option } from "@phisyx/safety.js/contracts";
 
-import vine from "@vinejs/vine";
 import { StringExtension } from "@phisyx/proposals.js/lang/string";
 import { toOption } from "@phisyx/safety.js/option";
+import { z, type ZodAny } from "zod";
 
 // ---- //
 // Type //
@@ -89,11 +88,11 @@ export class RoutePath
 		);
 	}
 
-	async eq(other: RoutePath): Promise<boolean>
+	eq(other: RoutePath): boolean
 	{
 		const simple = () => this.full().toString() === other.full().toString();
 
-		const adv = async () => {
+		const adv = () => {
 			const maybeParamsValues = other.full().matchGroups(this.toRegExp());
 
 			if (maybeParamsValues.is_none()) {
@@ -109,13 +108,13 @@ export class RoutePath
 					 return false;
 				}
 
-				await dynParams[param](value);
+				dynParams[param](value);
 			}
 
 			return true;
 		};
 
-		return simple() || await adv();
+		return simple() || adv();
 	}
 
 	toString(): string
@@ -126,13 +125,13 @@ export class RoutePath
 
 export class RoutePathSegment
 {
-	static from = (seg: string, schema?: VineAny) => new RoutePathSegment(seg, schema);
+	static from = (seg: string, schema?: ZodAny) => new RoutePathSegment(seg, schema);
 
 	#segment: string;
-	#schema: VineAny = vine.any();
+	#schema: ZodAny = z.any();
 	#dynValues: Set<string> = new Set();
 
-	constructor(segment: string, schema?: VineAny)
+	constructor(segment: string, schema?: ZodAny)
 	{
 		this.#segment = segment;
 
@@ -158,9 +157,9 @@ export class RoutePathSegment
 		return this.#segment.slice(startPos, endPos);
 	}
 
-	async addDynSegment($1: string)
+	addDynSegment($1: string)
 	{
-		const data = await vine.validate({ schema: this.#schema, data: $1 });
+		const data = this.#schema.parse($1);
 		this.#dynValues.add(data);
 	}
 

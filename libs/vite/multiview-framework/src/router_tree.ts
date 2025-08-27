@@ -52,18 +52,22 @@ export class RouterTree
 			Array.from(router.getRoutes(), (route) => [router, route] as const)
 		);
 
-		return Promise.any(routes.map(async ([router, route]) => {
-			if ( ! (
-				await route.getPath().eq(urlPath) || (
-					route.isIndex() &&
-					router.getPrefix() === urlPath.full().toString()
-				)
-			) ) return Promise.reject("No route found");
+		const r = routes.find(([router, route]) => {
+			return route.getPath().eq(urlPath) || (
+				route.isIndex() &&
+				router.getPrefix() === urlPath.full().toString()
+			);
+		});
 
-			return {
-				layout: router.getLayout(),
-				route,
-			};
-		}));
+		if (!r) {
+			return Promise.reject("No route found");
+		};
+
+		const [router, route] = r;
+
+		return {
+			layout: router.getLayout(),
+			route,
+		};
 	}
 }

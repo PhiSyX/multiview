@@ -2,7 +2,7 @@ import type { Option } from "@phisyx/safety.js/contracts";
 import type { ComponentRenderOutput, LazyComponentLayout, LazyComponentRenderOutput } from "#root/component";
 import type { LazyRenderClass, RenderClass, RouteHandler } from "#root/route";
 
-import vine from "@vinejs/vine";
+import z from "zod";
 import { None } from "@phisyx/safety.js/option";
 
 // ----------- //
@@ -22,12 +22,12 @@ type RenderStrategyEnum = typeof RenderStrategy[keyof typeof RenderStrategy];
 
 export class Renderer
 {
-	static #domSchema = vine.object({
-		head: vine.object({
-			title: vine.string().optional(),
-			styles: vine.array(vine.any()).optional(),
+	static #domSchema = z.object({
+		head: z.object({
+			title: z.string().optional(),
+			styles: z.array(z.any()).optional(),
 		}).optional(),
-		body: vine.any(),
+		body: z.any(),
 	});
 
 	#el!: HTMLElement;
@@ -151,7 +151,7 @@ export class Renderer
 		}
 
 		try {
-			const dom = await vine.validate({ schema: Renderer.#domSchema, data: value });
+			const dom = Renderer.#domSchema.parse(value);
 
 			if (dom.head?.title) {
 				document.title = dom.head.title;
@@ -292,4 +292,9 @@ function isTuple(h: unknown): h is [unknown, string]
 function isLazy(r: unknown): r is LazyComponentRenderOutput
 {
 	return typeof r === "object" && r?.constructor?.name === "Promise"
+}
+
+function isPrimitive(v: unknown): v is  string | number | bigint | boolean
+{
+	return ["string", "number", "bigint", "boolean"].includes(typeof v);
 }

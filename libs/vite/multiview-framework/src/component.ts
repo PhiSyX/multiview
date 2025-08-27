@@ -1,4 +1,4 @@
-import type { HTMLElementExtension } from "../exports/dom";
+import type { HTMLElementExtension } from "@phisyx/proposals.js/whatwg/html";
 
 // ---- //
 // Type //

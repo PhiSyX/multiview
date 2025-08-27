@@ -18,7 +18,8 @@ class LabelInputComponent extends HTMLFormInputComponentContract
 
 	constructor(props: LabelInputProps)
 	{
-		super();
+		super(props.name);
+
 		this.#props = props;
 	}
 
@@ -41,7 +42,7 @@ class LabelInputComponent extends HTMLFormInputComponentContract
 
 	private get id()
 	{
-		return this.#props.id || this.#props.name;
+		return this.#props.id || this.name;
 	}
 
 	private get type()
@@ -49,23 +50,17 @@ class LabelInputComponent extends HTMLFormInputComponentContract
 		return this.#props.type || "text";
 	}
 
-	// ------- //
-	// Méthode // -> Events
-	// ------- //
-
-	onInput = (evt: Event) => {
-		console.log(this.relatedForm, {evt});
-	};
 
 	// ------- //
 	// Méthode //
 	// ------- //
 
+	// handle errors
 	render()
 	{
 		return div.children(
 			label(this.#props.label + this.labelSuffix).for(this.id),
-			input(this.#props.name, this.type).id(this.id),
+			input(this.name, this.type).id(this.id),
 		);
 	}
 }

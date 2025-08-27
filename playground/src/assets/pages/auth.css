@@ -1,0 +1,41 @@
+.auth {
+	display: flex;
+	place-content: center;
+	place-items: center;
+	height: 100%;
+}
+
+.auth button,
+.auth input {
+	padding: 4px;
+	border: 1px solid;
+	border-radius: 4px;
+}
+
+.auth button,
+.auth label {
+	cursor: pointer;
+}
+
+.auth label {
+	font-variant: small-caps;
+}
+
+.auth-form {
+	display: grid;
+	gap: 8px;
+	padding: 8px;
+	border-radius: 8px;
+	background-color: CanvasText;
+	color: Canvas;
+	box-shadow: 0 16px 20px 0 #464f7a;
+	outline: 6px solid #7fb5c0;
+}
+
+
+.auth-form > div {
+	display: grid;
+	align-items: center;
+	grid-template-columns: 1fr auto;
+	gap: 16px;
+}

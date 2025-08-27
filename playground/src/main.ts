@@ -17,6 +17,7 @@ const baseRouter = createRouter({ layout: LayoutBase })
 	.addRoute("/", () => import("./controllers/home_controller"))
 	.addRoute("/about", [PagesController, "about"])
 	.addRoute("/contact", [PagesController, "contact"])
+	.addRoute("/counter", [PagesController, "counter"])
 	.addRoute(path("/pages", param("page")), [PagesController, "dynPage"])
 ;
 

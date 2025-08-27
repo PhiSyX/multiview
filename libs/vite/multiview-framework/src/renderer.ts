@@ -4,6 +4,7 @@ import type { LazyRenderClass, RenderClass, RouteHandler } from "#root/route";
 
 import z from "zod";
 import { None } from "@phisyx/safety.js/option";
+import { Signal } from "@phisyx/proposals.js/tc39/stage1";
 
 // ----------- //
 // Énumération //
@@ -130,6 +131,62 @@ export class Renderer
 
 	async renderObject(value: object, el: HTMLElement, strategy: RenderStrategyEnum)
 	{
+		if (value instanceof Signal.State) {
+			const handleSignal = (
+				child: InstanceType<typeof Signal.State<{ toString(): string }>>
+			) => {
+				const toNode = (val: { toString(): string }): Text => {
+					return document.createTextNode(val.toString());
+				};
+
+				let node = toNode(child.value.toString());
+
+				child.watch((oldValue, newValue) => {
+					if (oldValue.toString() === newValue.toString()) return;
+
+					let newNode = toNode(newValue.toString());
+					node.replaceWith(newNode);
+					node = newNode;
+				});
+
+				return node;
+			};
+
+			this.modify(
+				handleSignal(value),
+				this.#el,
+				RenderStrategy.Append,
+			)
+			return;
+		}
+
+		if (value instanceof Signal.Computed) {
+			const handleSignalComputed = (
+				child: InstanceType<typeof Signal.Computed<{ toString(): string }>>
+			) => {
+				const toNode = (val: { toString(): string }): Text => {
+					return document.createTextNode(val.toString());
+				};
+
+				let node = toNode(child.value.toString());
+
+				child.watch((newValue) => {
+					const newNode = toNode(newValue.toString());
+					node.replaceWith(newNode);
+					node = newNode;
+				});
+
+				return node;
+			};
+
+			this.modify(
+				handleSignalComputed(value),
+				this.#el,
+				RenderStrategy.Append,
+			)
+			return;
+		}
+
 		if (value instanceof Date) {
 			this.modify(value.toString(), el, strategy);
 			return;

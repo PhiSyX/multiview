@@ -13,6 +13,7 @@ type CreateRouterFnArgs = ConstructorParameters<typeof Router>;
 // ------ //
 
 export type { ComponentRenderOutput } from "#root/component";
+export { signal } from "@phisyx/proposals.js/tc39/stage1";
 
 export const createApp = (...args: CreateAppFnArgs) => new Application(...args);
 

@@ -1,3 +1,4 @@
+import type { Signal } from "@phisyx/proposals.js/lang/signal";
 import type { HTMLElementExtension } from "@phisyx/proposals.js/whatwg/html";
 
 // ---- //
@@ -23,6 +24,7 @@ export type ComponentRenderOutput =
 	| HTMLElementExtension<keyof HTMLElementTagNameMap>
 	| HTMLElement
 	| Node
+	| Signal<any>
 	| Date
 	| Function
 	| Record<string,
@@ -31,8 +33,9 @@ export type ComponentRenderOutput =
 		| number
 		| boolean
 		| HTMLElementExtension<keyof HTMLElementTagNameMap>
-		| Node
 		| HTMLElement
+		| Node
+		| Signal<any>
 		| Date
 		| Function
 	>;

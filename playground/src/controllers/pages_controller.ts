@@ -1,5 +1,4 @@
-import { signal } from "@multiview/framework-frontend";
-import { br, button, div } from "@multiview/framework-frontend/dom";
+import { lazyComponent } from "@multiview/framework-frontend";
 
 export default class PagesController
 {
@@ -10,25 +9,9 @@ export default class PagesController
 
 	counter()
 	{
-		const counter = signal(2);
-
-		const increment = () => counter.replace((c) => c + 1);
-		const decrement = () => counter.replace((c) => c - 1);
-
-		const counterDouble = counter.computed((c) => c * 2);
-
-		return div.children(
-			button().text("Increment +1").on("click", increment),
-			br(),
-			button().text("Decrement -1").on("click", decrement),
-			br(),
-			br(),
-			"Counter x1 : ",
-			counter,
-			br(),
-			"Counter x2 : ",
-			counterDouble,
-		);
+		return lazyComponent(import("../templates/components/Counter"), {
+			base: 2,
+		});
 	}
 
 	contact()

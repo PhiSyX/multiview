@@ -1,6 +1,5 @@
-import { button, div, form, h1, section } from "@multiview/framework-frontend/dom";
+import { lazyComponent } from "@multiview/framework-frontend";
 
-import { LabelInput } from "../templates/components/LabelInput";
 import * as z from "zod";
 
 export default class AuthController
@@ -12,23 +11,13 @@ export default class AuthController
 
 	login()
 	{
-		return section.id("page-auth").class("auth").children(
-			div.children(
-				h1("Se connecter").class("auth-title"),
-
-				form.post("/api/auth", { schema: AuthController.LoginSchema }).class("auth-form")
-					.input( LabelInput("identifier", "Identifiant") )
-					.input( LabelInput("password", "Mot de passe", { type: "current-password" }) )
-					.submit(
-						button.submit().text("Se connecter maintenant"),
-						this.handleLogin,
-					),
-			)
-				.css(() => import("../assets/pages/auth.css", { with: { type: "css" }}))
-		);
+		return lazyComponent(import("../templates/pages/auth/login"), {
+			schema: AuthController.LoginSchema,
+			onSubmit: this.handleLogin,
+		});
 	}
 
-	handleLogin = (evt: SubmitEvent, payload: any) =>
+	handleLogin = (evt: SubmitEvent, payload: { identifier: string; password: string; }) =>
 	{
 		console.log({ evt, payload });
 	};

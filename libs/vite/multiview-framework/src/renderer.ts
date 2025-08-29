@@ -1,5 +1,5 @@
 import type { Option } from "@phisyx/safety.js/contracts";
-import type { ComponentRenderOutput, LazyComponentLayout, LazyComponentRenderOutput } from "#root/component";
+import type { ComponentClass, ComponentRenderOutput, LazyComponentLayout, LazyComponentRenderOutput } from "#root/component";
 import type { LazyRenderClass, RenderClass, RouteHandler } from "#root/route";
 
 import z from "zod";
@@ -207,6 +207,12 @@ export class Renderer
 			return;
 		}
 
+		if ("default" in value) {
+			// FIXME: type
+			await this.pureRender(value.default, el, strategy);
+			return;
+		}
+
 		try {
 			const dom = Renderer.#domSchema.parse(value);
 
@@ -354,4 +360,28 @@ function isLazy(r: unknown): r is LazyComponentRenderOutput
 function isPrimitive(v: unknown): v is  string | number | bigint | boolean
 {
 	return ["string", "number", "bigint", "boolean"].includes(typeof v);
+}
+
+export async function lazyComponent<P extends { [p: string]: any }>(
+	fut: Promise<{
+		default:
+			| ( (props: P) => ComponentRenderOutput )
+			| ComponentClass<P>
+	}>,
+	props?: P
+)
+{
+	const v = (await fut).default;
+
+	const isFnComponent = <P extends { [p: string]: any }>(fn: unknown):
+		fn is ((props: P) => ComponentRenderOutput) => (
+			typeof fn === "function" && fn instanceof Function
+		);
+
+	if (isFnComponent<P>(v)) {
+		return v(props || {} as P);
+	}
+
+	const vi = new v();
+	return vi.render(props || {} as P);
 }
